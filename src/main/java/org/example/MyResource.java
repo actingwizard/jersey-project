@@ -5,11 +5,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+//TODO: correctly remove this class/file. UNUSED
+
 /**
  * Root resource (exposed at "myresource" path)
  */
 @Path("myresource")
 public class MyResource {
+
+
 
     /**
      * Method handling HTTP GET requests. The returned object will be sent

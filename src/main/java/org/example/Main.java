@@ -13,7 +13,7 @@ import java.net.URI;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:9090/sysdev/";
+    public static final String BASE_URI = "http://localhost:9090/sysdev";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
@@ -40,12 +40,6 @@ public class Main {
                 + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
         System.in.read();
         server.stop();
-
-//        RequestRouteService.shortestPathSeach(8.681495,49.41461,8.686507,49.41943);
-
-//        RequestRouteService.poiSearch(48.1499, 11.5942);
-
-
     }
 }
 

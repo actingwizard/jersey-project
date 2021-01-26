@@ -18,24 +18,23 @@ public class RequestRouteService {
     private static final String OPENROUTESERVICE_SHORTEST_PATH_URL = "https://api.openrouteservice.org/v2/directions/driving-car/geojson";
     private static final String OPENROUTESERVICE_KEY = "5b3ce3597851110001cf62488ba2318e6f58480bb3f31a6533a3618e";
 
-    public static JsonObject shortestPathSearch(double lat_s, double lon_s, double lat_f, double lon_f) {
+    public static JsonObject shortestPathSearch(double lon_s, double lat_s, double lon_f, double lat_f) {
         // create a json object which will be in the following format
         // {
         //      "coordinates": [[8.681495,49.41461],[8.687872,49.420318]]
         // }
-//        System.out.println(lat_s + " " + lon_s + " " + lat_f + " " + lon_f);
         final JsonObject request = Json.createObjectBuilder()
                 .add("coordinates",
                         Json.createArrayBuilder()
                                 .add(
                                         Json.createArrayBuilder()
-                                            .add(lat_s)
                                             .add(lon_s)
+                                            .add(lat_s)
                                             .build())
                                 .add(
                                         Json.createArrayBuilder()
-                                            .add(lat_f)
                                             .add(lon_f)
+                                            .add(lat_f)
                                             .build())
                                 .build())
                 .build();
@@ -49,8 +48,8 @@ public class RequestRouteService {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .post(Entity.json(request));
 
+        System.out.println("Response status from ORService: " + response.getStatus());
 
-        System.out.println(response.toString());
         // check the result
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
             throw new RuntimeException("Failed: HTTP error code: " + response.getStatus());
@@ -61,13 +60,12 @@ public class RequestRouteService {
         final JsonObject jsonObject = Json.createReader(new StringReader(responseString)).readObject();
 
         // Extract the coordinates of the shortest path
-//        final JsonArray geometry = jsonObject
-//                .getJsonArray("features")
-//                .getJsonObject(0)
-//                .getJsonObject("geometry")
-//                .getJsonArray("coordinates");
+        final JsonArray geometry = jsonObject
+                .getJsonArray("features")
+                .getJsonObject(0)
+                .getJsonObject("geometry")
+                .getJsonArray("coordinates");
         return jsonObject;
-
     }
 
 
@@ -107,8 +105,6 @@ public class RequestRouteService {
         final String responseString = response.readEntity(String.class);
         final JsonObject jsonObject = Json.createReader(new StringReader(responseString)).readObject();
         System.out.println("Response: " + jsonObject);
-
-
 
         // Extract the elevation
         final JsonNumber elevation = jsonObject

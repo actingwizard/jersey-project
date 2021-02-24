@@ -2,15 +2,16 @@ package com.sysdev.computation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// Graph instance treated as SINGLETON
 public class Graph {
     private static Graph INSTANCE = null;
 
+    // internal fields for graph storing
     private ArrayList<Coordinate> coordinates;
     private double[][] adjMat = null;
     private HashMap<Coordinate, Integer> labelsMap = null;
@@ -40,11 +41,7 @@ public class Graph {
         return closestNode;
     }
 
-//    public void shortestPath(Coordinate startN, Coordinate endN, String searchMethod) {
-//        SearchAlgorithm sa = new SearchAlgorithm();
-//        sa.run(nextNode(startN), nextNode(endN), searchMethod);
-//    }
-
+    // returns list of neighbours of Coordinate
     public ArrayList<Coordinate> nodeNeighbours(Coordinate node) {
         ArrayList<Coordinate> result = new ArrayList<>();
         for (int i = 0; i < adjMat.length; ++i) {
@@ -56,6 +53,7 @@ public class Graph {
     }
 
     private void makeGraph(JsonNode tempArray) {
+        System.out.println("Initializing Data Structures to store graph..");
         coordinates = new ArrayList<>();
         for (JsonNode jn : tempArray) {
             if (jn.path("geometry").get("type").asText().equals("LineString")) {
@@ -73,9 +71,7 @@ public class Graph {
             }
         }
 
-        System.out.println("Number of nodes:" + coordinates.size());
-        for (int i = 0; i < coordinates.size(); ++i)
-            System.out.println(i + ":" + coordinates.get(i).toString());
+        System.out.println("Number of nodes in graph:" + coordinates.size());
 
         adjMat = new double[coordinates.size()][coordinates.size()];
         for (int i = 0; i < adjMat.length; ++i) {
@@ -83,7 +79,6 @@ public class Graph {
                 adjMat[i][j] = 0;
             }
         }
-
 
         for (JsonNode jn : tempArray) {
             JsonNode geometry = jn.path("geometry");
@@ -103,9 +98,11 @@ public class Graph {
                 }
             }
         }
+        System.out.println("Graph initialization is finished.");
     }
 
     private JsonNode loadJSON(String filename) {
+        System.out.println("JSON Map of city is loading..");
         String name = Main.class.getName().replace(".", File.separator);
         String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + name.substring(0, name.lastIndexOf(File.separator));
         JsonNode tempArray = null;
@@ -114,11 +111,11 @@ public class Graph {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("JSON Map of city successfully loaded.");
         return tempArray;
     }
 
-    public static double calculateHaversine(Coordinate cr1, Coordinate cr2) {
-//        return Math.sqrt(Math.pow(cr2.getLat() - cr1.getLat(), 2.0) + Math.pow(cr2.getLon() - cr1.getLon(), 2.0));
+    public double calculateHaversine(Coordinate cr1, Coordinate cr2) {
         // distance between latitudes and longitudes
         double dLat = Math.toRadians(cr2.getLat() - cr1.getLat());
         double dLon = Math.toRadians(cr2.getLon() - cr1.getLon());

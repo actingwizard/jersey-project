@@ -1,7 +1,5 @@
 package com.sysdev.computation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -37,10 +35,8 @@ public class Main {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-//        Graph graph = new Graph("schleswig-holstein.json");
-//        graph.shortestPath(new Coordinate(9.826841354370117,54.483552499291534), new Coordinate(9.839372634887695,54.4656480544963), "dijkstra");
         Graph schleswig = Graph.getInstance();
-//                Coordinate(9.0966796875,51.12076493195686) Coordinate(9.9755859375,51.282534682474655)
+        System.out.println("Graph is successfully loaded..");
 
         final HttpServer server = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "

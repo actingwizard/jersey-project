@@ -20,7 +20,7 @@ public class AStar {
             @DefaultValue("0.0") @QueryParam("originLon") double originLon,
             @DefaultValue("0.0") @QueryParam("destinationLat") double destinationLat,
             @DefaultValue("0.0") @QueryParam("destinationLon") double destinationLon) {
-        System.out.println("GET AStar from client:" +
+        System.out.println("Client requested GET [AStar]:" +
                 "oLat " + originLat +
                 "; oLon " + originLon +
                 "; dLat " + destinationLat +
@@ -39,7 +39,7 @@ public class AStar {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .get(Response.class);
 
-        System.out.println("Response status from ORService: " + response.getStatus());
+        System.out.println("Response status from Computation Server: " + response.getStatus());
 
         // check the result
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {

@@ -1,18 +1,13 @@
 package com.sysdev.routing;
 
 import jakarta.json.Json;
-import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyWebTarget;
-
-import java.io.File;
 import java.io.StringReader;
 
 @Path("/dijkstra")
@@ -24,7 +19,7 @@ public class Dijkstra {
             @DefaultValue("0.0") @QueryParam("originLon") double originLon,
             @DefaultValue("0.0") @QueryParam("destinationLat") double destinationLat,
             @DefaultValue("0.0") @QueryParam("destinationLon") double destinationLon) {
-        System.out.println("GET Dijkstra from client:" +
+        System.out.println("Client requested GET [Djikstra]:" +
                 "oLat " + originLat +
                 "; oLon " + originLon +
                 "; dLat " + destinationLat +
@@ -43,7 +38,7 @@ public class Dijkstra {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .get(Response.class);
 
-        System.out.println("Response status from ORService: " + response.getStatus());
+        System.out.println("Response status from Computation Server: " + response.getStatus());
 
         // check the result
         if (response.getStatus() != Response.Status.OK.getStatusCode()) {
@@ -56,6 +51,6 @@ public class Dijkstra {
 
         return Response
                 .status(200)
-            .entity(jsonObject).build();
+                .entity(jsonObject).build();
     }
 }

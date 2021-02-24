@@ -1,7 +1,7 @@
 /**
  * CORS filter for Jersey.
  */
-package org.example;
+package com.sysdev.routing;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;

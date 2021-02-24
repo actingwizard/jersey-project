@@ -1,19 +1,15 @@
-package org.example;
+package com.sysdev.computation;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-//TODO: correctly remove this class/file. UNUSED
-
 /**
  * Root resource (exposed at "myresource" path)
  */
 @Path("myresource")
 public class MyResource {
-
-
 
     /**
      * Method handling HTTP GET requests. The returned object will be sent
@@ -24,6 +20,10 @@ public class MyResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt() {
+        System.out.println(new Coordinate(1.000, 2.500).equals(new Coordinate(1.000, 2.500)));
+
+//        Graph graph = new Graph("simplegraph.json");
+
         return "Got it!";
     }
 }

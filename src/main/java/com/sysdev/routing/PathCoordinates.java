@@ -1,4 +1,4 @@
-package org.example;
+package com.sysdev.routing;
 
 public class PathCoordinates {
     private double originLat;

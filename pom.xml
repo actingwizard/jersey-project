@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>com.sysdev</groupId>
     <artifactId>jersey-project</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -46,6 +46,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,7 +77,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.example.Main</mainClass>
+                    <mainClass>com.sysdev.routing.Main</mainClass>
+                    <mainClass>com.sysdev.computation.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>

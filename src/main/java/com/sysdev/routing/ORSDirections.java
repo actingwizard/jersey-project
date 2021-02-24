@@ -1,7 +1,5 @@
-package org.example;
+package com.sysdev.routing;
 
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

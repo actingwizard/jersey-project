@@ -2,6 +2,7 @@ package com.sysdev.computation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,10 +12,8 @@ import java.util.HashMap;
 public class Graph {
     private static Graph INSTANCE = null;
 
-    // internal fields for graph storing
-    private ArrayList<Coordinate> coordinates;
-    private double[][] adjMat = null;
-    private HashMap<Coordinate, Integer> labelsMap = null;
+    // internal field for graph storing
+    private HashMap<Coordinate, ArrayList<GraphConnectNode>> database = null;
 
     public static Graph getInstance() {
         if (INSTANCE == null) {
@@ -27,92 +26,6 @@ public class Graph {
     private Graph(String fileName) {
         JsonNode tempArray = loadJSON(fileName);
         makeGraph(tempArray);
-    }
-
-    public Coordinate nextNode(Coordinate node) {
-        double DIST_MIN = Double.MAX_VALUE;
-        Coordinate closestNode = null;
-        for (int i = 0; i < coordinates.size(); ++i) {
-            if (calculateHaversine(node, coordinates.get(i)) < DIST_MIN) {
-                closestNode = coordinates.get(i);
-                DIST_MIN = calculateHaversine(node, coordinates.get(i));
-            }
-        }
-        return closestNode;
-    }
-
-    // returns list of neighbours of Coordinate
-    public ArrayList<Coordinate> nodeNeighbours(Coordinate node) {
-        ArrayList<Coordinate> result = new ArrayList<>();
-        for (int i = 0; i < adjMat.length; ++i) {
-            if (adjMat[getLabel(node)][i] != 0) {
-                result.add(getCoordinate(i));
-            }
-        }
-        return result;
-    }
-
-    private void makeGraph(JsonNode tempArray) {
-        System.out.println("Initializing Data Structures to store graph..");
-        coordinates = new ArrayList<>();
-        for (JsonNode jn : tempArray) {
-            if (jn.path("geometry").get("type").asText().equals("LineString")) {
-                if (labelsMap == null) {
-                    labelsMap = new HashMap<Coordinate, Integer>();
-                }
-                JsonNode crds = jn.path("geometry").path("coordinates");
-                for (JsonNode coordinate : crds) {
-                    Coordinate cr = new Coordinate(coordinate.get(0).asDouble(), coordinate.get(1).asDouble());
-                    if (!labelsMap.containsKey(cr)) {
-                        coordinates.add(cr);
-                        labelsMap.put(cr, coordinates.size() - 1);
-                    }
-                }
-            }
-        }
-
-        System.out.println("Number of nodes in graph:" + coordinates.size());
-
-        adjMat = new double[coordinates.size()][coordinates.size()];
-        for (int i = 0; i < adjMat.length; ++i) {
-            for (int j = 0; j < adjMat.length; ++j) {
-                adjMat[i][j] = 0;
-            }
-        }
-
-        for (JsonNode jn : tempArray) {
-            JsonNode geometry = jn.path("geometry");
-            if (jn.path("geometry").get("type").asText().equals("LineString")) {
-                Coordinate prevCr = null;
-                JsonNode crds = jn.path("geometry").path("coordinates");
-                for (JsonNode coordinate : crds) {
-                    Coordinate cr = new Coordinate(coordinate.get(0).asDouble(), coordinate.get(1).asDouble());
-                    if (prevCr == null) {
-                        prevCr = cr;
-                    } else {
-                        double t_dist = calculateHaversine(cr, prevCr);
-                        adjMat[getLabel(cr)][getLabel(prevCr)] = t_dist;
-                        adjMat[getLabel(prevCr)][getLabel(cr)] = t_dist;
-                        prevCr = cr;
-                    }
-                }
-            }
-        }
-        System.out.println("Graph initialization is finished.");
-    }
-
-    private JsonNode loadJSON(String filename) {
-        System.out.println("JSON Map of city is loading..");
-        String name = Main.class.getName().replace(".", File.separator);
-        String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + name.substring(0, name.lastIndexOf(File.separator));
-        JsonNode tempArray = null;
-        try {
-            tempArray = new ObjectMapper().readTree(new File((path + "/" + filename))).get("features");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON Map of city successfully loaded.");
-        return tempArray;
     }
 
     public double calculateHaversine(Coordinate cr1, Coordinate cr2) {
@@ -134,16 +47,90 @@ public class Graph {
         return rad * c;
     }
 
-    private int getLabel(Coordinate cr) {
-        return labelsMap.get(cr);
+    // finds closest node from graph
+    public Coordinate nextNode(Coordinate node) {
+        double DIST_MIN = Double.MAX_VALUE;
+        Coordinate closestNode = null;
+        for (Coordinate cr : database.keySet()) {
+            if (calculateHaversine(node, cr) < DIST_MIN) {
+                closestNode = cr;
+                DIST_MIN = calculateHaversine(node, cr);
+            }
+        }
+        return closestNode;
     }
 
-    private Coordinate getCoordinate(int label) {
-        return coordinates.get(label);
+    // returns list of neighbours of Coordinate
+    public ArrayList<Coordinate> nodeNeighbours(Coordinate node) {
+        ArrayList<Coordinate> result = new ArrayList<>();
+        ArrayList<GraphConnectNode> neighbours = database.get(node);
+        for (GraphConnectNode gnc : neighbours) {
+            result.add(gnc.getCoordinate());
+        }
+        return result;
     }
 
+    // returns distance between 2 nodes in graph
     public double getDistance(Coordinate cr1, Coordinate cr2) {
-        return adjMat[getLabel(cr1)][getLabel(cr2)];
+        for (GraphConnectNode gnc : database.get(cr1)) {
+            if (gnc.getCoordinate().equals(cr2)) {
+                return gnc.getDistance();
+            }
+        }
+        return 0.0;
     }
 
+    private void makeGraph(JsonNode tempArray) {
+        System.out.println("****\nInitializing Data Structures to store graph..");
+        database = new HashMap<>();
+        int MAX_DEG_VER = Integer.MIN_VALUE;
+        for (JsonNode jn : tempArray) {
+           if (jn.path("geometry").get("type").asText().equals("LineString")) {
+                Coordinate prevCr = null;
+                JsonNode crds = jn.path("geometry").path("coordinates");
+                for (JsonNode coordinate : crds) {
+                    Coordinate cr = new Coordinate(coordinate.get(0).asDouble(), coordinate.get(1).asDouble());
+                    if (!database.containsKey(cr)) {
+                        database.put(cr, new ArrayList<GraphConnectNode>());
+                    }
+                    if (prevCr == null) {
+                        prevCr = cr;
+                    } else {
+                        double t_dist = calculateHaversine(cr, prevCr);
+                        boolean shouldAdd = true;
+                        for (GraphConnectNode gnc : database.get(cr)) {
+                            if (gnc.getCoordinate().equals(prevCr)) {
+                                shouldAdd = false;
+                                break;
+                            }
+                        }
+                        if (shouldAdd) {
+                            database.get(cr).add(new GraphConnectNode(prevCr, t_dist));
+                            database.get(prevCr).add(new GraphConnectNode(cr, t_dist));
+                        }
+                        if (database.get(cr).size() > MAX_DEG_VER)
+                            MAX_DEG_VER = database.get(cr).size();
+                        prevCr = cr;
+
+                    }
+                }
+            }
+        }
+        System.out.println("Graph initialization is finished.");
+        System.out.println("Graph STATS:\nNumber of nodes:" + database.size() + "\nMax degree of vertex:" + MAX_DEG_VER);
+    }
+
+    private JsonNode loadJSON(String filename) {
+        System.out.println("****\nJSON Map of city is loading..");
+        String name = Main.class.getName().replace(".", File.separator);
+        String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + name.substring(0, name.lastIndexOf(File.separator));
+        JsonNode tempArray = null;
+        try {
+            tempArray = new ObjectMapper().readTree(new File((path + "/" + filename))).get("features");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON Map of city successfully loaded.");
+        return tempArray;
+    }
 }

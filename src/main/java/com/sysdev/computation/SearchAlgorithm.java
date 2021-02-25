@@ -1,6 +1,5 @@
 package com.sysdev.computation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 
 public class SearchAlgorithm {
@@ -19,13 +18,11 @@ public class SearchAlgorithm {
         System.out.println("Restoring the path..");
         SearchNode s = closedMap.get(END_NODE);
         while (s.getCoordinate() != START_NODE) {
-//            System.out.println(s);
             path.add(s.getCoordinate());
             s = closedMap.get(s.getPreviousCoordinate());
         }
         path.add(closedMap.get(START_NODE).getCoordinate());
-        System.out.println("SUCCESS!");
-//        System.out.println(closedMap.get(START_NODE));
+        System.out.println("Path is restored");
         return path;
     }
 
@@ -52,24 +49,13 @@ public class SearchAlgorithm {
         openPQ.add(starting);
         System.out.println("Search started..");
         while (!openPQ.isEmpty()) {
-//            System.out.println("NEW ITERATION");
-//            SearchNode[] events = openPQ.toArray(new SearchNode[openPQ.size()]);
-//            Arrays.sort(events, openPQ.comparator());
-//            System.out.print("openPQ:");
-//            for (SearchNode e : events) {
-//                System.out.print(e + " | ");
-//            }
-
             SearchNode q = openPQ.poll();
             ArrayList<Coordinate> neighbours = Graph.getInstance().nodeNeighbours(q.getCoordinate());
-//            System.out.println("\nCurr node:" + q);
-
             if (!closedMap.containsKey(q.getCoordinate()) || closedMap.get(q.getCoordinate()).getF() > q.getF()) {
                 closedMap.put(q.getCoordinate(), q);
             }
-
             if (q.getCoordinate().equals(this.END_NODE)) {
-                System.out.println("FOUND END");
+                System.out.println("Path is successfully found.");
                 long endTime = System.nanoTime();
                 long duration = (endTime - startTime) / 1000000;  //divide by 1000000 to get milliseconds.
                 System.out.println("Search took: " + duration + " ms");
@@ -81,15 +67,9 @@ public class SearchAlgorithm {
                 successor.setH(searchMethod.getHeuristic(cr, END_NODE));
                 successor.calculateF();
                 successor.setPreviousCoordinate(q.getCoordinate());
-//                System.out.println("S:" + successor);
-
                 if (isNeedAdd(successor)) {
-//                    System.out.println("Added to PQ");
                     openPQ.add(successor);
                 }
-//                else {
-//                    System.out.println("Not added to PQ");
-//                }
             }
         }
         return new ArrayList<>();

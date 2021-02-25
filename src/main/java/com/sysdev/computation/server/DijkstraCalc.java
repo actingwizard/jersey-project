@@ -22,7 +22,7 @@ public class DijkstraCalc {
             @DefaultValue("0.0") @QueryParam("originLon") double originLon,
             @DefaultValue("0.0") @QueryParam("destinationLat") double destinationLat,
             @DefaultValue("0.0") @QueryParam("destinationLon") double destinationLon) {
-        System.out.println("GET [Djikstra] from Routing Server:" +
+        System.out.println("****\nGET [Djikstra] from Routing Server:" +
                 "oLat " + originLat +
                 "; oLon " + originLon +
                 "; dLat " + destinationLat +

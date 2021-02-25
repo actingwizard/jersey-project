@@ -36,7 +36,6 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         Graph schleswig = Graph.getInstance();
-        System.out.println("Graph is successfully loaded..");
 
         final HttpServer server = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "

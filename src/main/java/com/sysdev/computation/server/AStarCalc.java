@@ -22,7 +22,7 @@ public class AStarCalc {
             @DefaultValue("0.0") @QueryParam("originLon") double originLon,
             @DefaultValue("0.0") @QueryParam("destinationLat") double destinationLat,
             @DefaultValue("0.0") @QueryParam("destinationLon") double destinationLon) {
-        System.out.println("GET [AStar] from Routing Server:" +
+        System.out.println("****\nGET [AStar] from Routing Server:" +
                 "oLat " + originLat +
                 "; oLon " + originLon +
                 "; dLat " + destinationLat +
